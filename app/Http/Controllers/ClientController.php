@@ -46,7 +46,7 @@ class ClientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return Client::find($id)->update($request->all());
+        return response()->json(Client::find($id)->update($request->all()));
     }
 
     /**
@@ -56,6 +56,6 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
-        return Client::find($id)->delete();
+        return response()->json(Client::find($id)->delete());
     }
 }
