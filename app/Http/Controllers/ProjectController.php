@@ -2,29 +2,31 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\Client;
-use App\Repositories\ClientRepository;
-use App\Services\ClientService;
+use App\Entities\Project;
+use App\Repositories\ProjectRepository;
+use App\Services\ProjectService;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
-class ClientController extends Controller
+class ProjectController extends Controller
 {
 
     private $repository;
     private $service;
 
-    public function __construct(ClientRepository $repository, ClientService $service)
+    /**
+     * 
+     */
+    public function __construct(ProjectRepository $repository, ProjectService $service)
     {
         $this->repository = $repository;
         $this->service = $service;
     }
 
     /**
-     * lista todos os clientes
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * 
      */
     public function index()
     {
@@ -32,9 +34,7 @@ class ClientController extends Controller
     }
 
     /**
-     * criar cliente
-     * @param Request $request
-     * @return static
+     * 
      */
     public function store(Request $request)
     {
@@ -42,19 +42,15 @@ class ClientController extends Controller
     }
 
     /**
-     * @param $id
-     * @return mixed
+     * 
      */
     public function show($id)
     {
-        return $this->repository->find($id);
+        return $this->repository->with(['client', 'user'])->find($id);
     }
 
     /**
-     * altera cliente
-     * @param Request $request
-     * @param $id
-     * @return mixed
+     * 
      */
     public function update(Request $request, $id)
     {
@@ -62,9 +58,7 @@ class ClientController extends Controller
     }
 
     /**
-     * deleta cliente
-     * @param $id
-     * @return mixed
+     * 
      */
     public function destroy($id)
     {

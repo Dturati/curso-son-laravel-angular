@@ -12,3 +12,4 @@
 */
 
 Route::resource('client', 'ClientController');
+Route::resource('project', 'ProjectController');
