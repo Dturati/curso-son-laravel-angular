@@ -7,6 +7,9 @@ use App\Repositories\ProjectRepository;
 use App\Services\ProjectService;
 use Illuminate\Http\Request;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -46,7 +49,11 @@ class ProjectController extends Controller
      */
     public function show($id)
     {
-        return $this->repository->with(['client', 'user'])->find($id);
+        try {
+             return $this->repository->with(['client', 'user'])->find($id);
+        } catch (ModelNotFoundException $e) {
+            return ['error'=>true, 'msg' => 'O Projeto não foi encontrado.'];
+        }
     }
 
     /**
@@ -54,7 +61,11 @@ class ProjectController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json($this->service->update($request->all(), $id));
+        try {
+            return response()->json($this->service->update($request->all(), $id));
+        } catch (ModelNotFoundException $e) {
+            return ['error'=>true, 'msg' => 'O Projeto não foi encontrado.'];
+        }
     }
 
     /**
@@ -62,6 +73,15 @@ class ProjectController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json($this->repository->find($id)->delete());
+        try {
+            $this->repository->find($id)->delete();
+            return ['success'=>true, 'msg' => 'Projeto deletado com sucesso!'];
+        } catch (QueryException $e) {
+            return ['error'=>true, 'msg' => 'O Projeto não pode ser apagado pois existe um ou mais clientes vinculados a ele.'];
+        } catch (ModelNotFoundException $e) {
+            return ['error'=>true, 'msg' => 'Projeto não foi encontrado.'];
+        } catch (\Exception $e) {
+            return ['error'=>true, 'msg' => 'Ocorreu algum erro ao excluir o Projeto.'];
+        }
     }
 }

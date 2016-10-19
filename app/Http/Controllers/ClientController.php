@@ -7,6 +7,9 @@ use App\Repositories\ClientRepository;
 use App\Services\ClientService;
 use Illuminate\Http\Request;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
+
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 
@@ -47,7 +50,11 @@ class ClientController extends Controller
      */
     public function show($id)
     {
-        return $this->repository->find($id);
+        try {
+            return $this->repository->find($id);
+        } catch (ModelNotFoundException $e) {
+            return ['error'=>true, 'msg' => 'Cliente não encontrado.'];
+        }
     }
 
     /**
@@ -58,7 +65,11 @@ class ClientController extends Controller
      */
     public function update(Request $request, $id)
     {
-        return response()->json($this->service->update($request->all(), $id));
+        try {
+            return response()->json($this->service->update($request->all(), $id));
+        } catch (ModelNotFoundException $e) {
+            return ['error'=>true, 'msg' => 'Cliente não encontrado.'];
+        }
     }
 
     /**
@@ -68,6 +79,15 @@ class ClientController extends Controller
      */
     public function destroy($id)
     {
-        return response()->json($this->repository->find($id)->delete());
+        try {
+            $this->repository->find($id)->delete();
+            return ['success'=>true, 'msg' => 'Cliente deletado com sucesso!'];
+        } catch (QueryException $e) {
+            return ['error'=>true, 'msg' => 'Cliente não pode ser apagado pois existe um ou mais clientes vinculados a ele.'];
+        } catch (ModelNotFoundException $e) {
+            return ['error'=>true, 'msg' => 'Cliente não encontrado.'];
+        } catch (\Exception $e) {
+            return ['error'=>true, 'msg' => 'Ocorreu algum erro ao excluir o cliente.'];
+        }
     }
 }
